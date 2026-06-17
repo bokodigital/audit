@@ -641,7 +641,7 @@ function Results({ contact, answers, aiRecs, loading, onRestart }) {
 
   return (
     <Shell tag="Your Results">
-      <style>{`@media (max-width:560px){.boko-hero{flex-direction:column;}.boko-hero-text{text-align:center;width:100%;}.boko-cta{flex-direction:column;}.boko-cta-btn{width:100%;justify-content:center;}}`}</style>
+      <style>{`@media (max-width:560px){.boko-hero{flex-direction:column;}.boko-hero-text{text-align:center;width:100%;}.boko-cta{flex-direction:column;}.boko-cta-btn{width:100%;box-sizing:border-box;justify-content:center;}}`}</style>
       {/* Score hero */}
       <Card style={{ marginBottom:16 }}>
         <div className="boko-hero" style={{ display:"flex", alignItems:"center", gap:24, flexWrap:"wrap", marginBottom:20 }}>
