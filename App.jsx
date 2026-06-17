@@ -13,7 +13,7 @@ const HS_FORM_GUID = "31a9c609-ab93-4d80-8231-8aa50a945416";   // AI Automation 
 // ═══════════════════════════════════════════════════════════════════
 const LIME   = "#BFFC00";
 const BLACK  = "#0A0A0A";
-const GRAY   = "#6B7280";
+const GRAY   = "#4B5563";
 const LGRAY  = "#F0F2F5";
 const WHITE  = "#FFFFFF";
 const FONT   = "'Poppins', system-ui, sans-serif";
@@ -721,15 +721,15 @@ function Results({ contact, answers, aiRecs, loading, onRestart }) {
             {aiRecs.threeMonth   && <RecPanel title="3-month automations"  sub="Medium-term plays"         items={aiRecs.threeMonth} accent="#F59E0B" />}
 
             {(aiRecs.timeSaved || aiRecs.revenueLift) && (
-              <div style={{ display:"flex", gap:12 }}>
+              <div style={{ display:"flex", flexWrap:"wrap", gap:12 }}>
                 {aiRecs.timeSaved && (
-                  <div style={{ flex:1, background:"#ECFDF5", border:"1px solid #A7F3D0", borderRadius:10, padding:14, textAlign:"center" }}>
+                  <div style={{ flex:"1 1 200px", background:"#ECFDF5", border:"1px solid #A7F3D0", borderRadius:10, padding:14, textAlign:"center" }}>
                     <p style={{ fontFamily:FONT, fontWeight:800, fontSize:"20px", color:"#059669", margin:"0 0 2px" }}>{aiRecs.timeSaved}</p>
                     <p style={{ fontFamily:FONT, fontSize:"10px", color:"#065F46", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.05em", margin:0 }}>Time saved/week</p>
                   </div>
                 )}
                 {aiRecs.revenueLift && (
-                  <div style={{ flex:1, background:"#EFF6FF", border:"1px solid #BFDBFE", borderRadius:10, padding:14, textAlign:"center" }}>
+                  <div style={{ flex:"1 1 200px", background:"#EFF6FF", border:"1px solid #BFDBFE", borderRadius:10, padding:14, textAlign:"center" }}>
                     <p style={{ fontFamily:FONT, fontWeight:800, fontSize:"20px", color:"#1D4ED8", margin:"0 0 2px" }}>{aiRecs.revenueLift}</p>
                     <p style={{ fontFamily:FONT, fontSize:"10px", color:"#1E3A8A", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.05em", margin:0 }}>Revenue uplift/month</p>
                   </div>
@@ -749,7 +749,7 @@ function Results({ contact, answers, aiRecs, loading, onRestart }) {
       {/* CTA */}
       <div style={{ background:BLACK, borderRadius:16, padding:24, marginBottom:16 }}>
         <h2 style={{ fontFamily:FONT, fontSize:"17px", fontWeight:700, color:WHITE, margin:"0 0 8px" }}>Recommended next step</h2>
-        <p style={{ fontFamily:FONT, fontSize:"13px", color:"#94A3B8", margin:"0 0 18px", lineHeight:1.65 }}>
+        <p style={{ fontFamily:FONT, fontSize:"13px", color:"#F8F9FC", margin:"0 0 18px", lineHeight:1.65 }}>
           {sc.label === "Advanced"    && "You're ready for advanced AI integrations. Let's map a full automation strategy."}
           {sc.label === "Developing"  && "Target your weakest area first for the fastest ROI. Book a 30-min strategy call."}
           {sc.label === "Early Stage" && "Start with 1–2 quick wins, then build a phased automation roadmap with our team."}
@@ -758,16 +758,16 @@ function Results({ contact, answers, aiRecs, loading, onRestart }) {
           <a href="mailto:mariam@boko.com.au?subject=Audit Results — Strategy Call"
             style={{ display:"inline-flex", alignItems:"center", gap:6, background:LIME, color:BLACK,
               padding:"11px 20px", borderRadius:9, textDecoration:"none", fontFamily:FONT, fontSize:"14px", fontWeight:700 }}>
-            📧 Book a strategy call
+            Book a strategy call
           </a>
           <a href="https://boko.com.au" target="_blank" rel="noopener noreferrer"
             style={{ display:"inline-flex", alignItems:"center", gap:6, background:"rgba(255,255,255,0.08)",
-              border:"1px solid rgba(255,255,255,0.15)", color:"#CBD5E1",
+              border:"1px solid rgba(255,255,255,0.30)", color:"#F8F9FC",
               padding:"11px 20px", borderRadius:9, textDecoration:"none", fontFamily:FONT, fontSize:"14px", fontWeight:600 }}>
-            🌐 boko.com.au
+            boko.com.au
           </a>
         </div>
-        <p style={{ fontFamily:FONT, fontSize:"11px", color:"#475569", margin:"14px 0 0" }}>Mariam · mariam@boko.com.au · boko.com.au</p>
+        <p style={{ fontFamily:FONT, fontSize:"11px", color:"#F8F9FC", margin:"14px 0 0" }}>Mariam · mariam@boko.com.au · boko.com.au</p>
       </div>
 
       <div style={{ textAlign:"center" }}>
