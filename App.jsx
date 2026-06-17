@@ -641,11 +641,12 @@ function Results({ contact, answers, aiRecs, loading, onRestart }) {
 
   return (
     <Shell tag="Your Results">
+      <style>{`@media (max-width:560px){.boko-hero{flex-direction:column;}.boko-hero-text{text-align:center;width:100%;}}`}</style>
       {/* Score hero */}
       <Card style={{ marginBottom:16 }}>
-        <div style={{ display:"flex", alignItems:"center", gap:24, flexWrap:"wrap", marginBottom:20 }}>
+        <div className="boko-hero" style={{ display:"flex", alignItems:"center", gap:24, flexWrap:"wrap", marginBottom:20 }}>
           <ScoreRing total={sc.total} max={sc.max} />
-          <div style={{ flex:1, minWidth:160 }}>
+          <div className="boko-hero-text" style={{ flex:1, minWidth:160 }}>
             <div style={{ display:"inline-block", background:readinessBg, border:`1px solid ${readinessColor}40`, borderRadius:10, padding:"8px 14px", marginBottom:8 }}>
               <p style={{ fontFamily:FONT, fontSize:"10px", fontWeight:700, color:readinessColor, textTransform:"uppercase", letterSpacing:"0.08em", margin:"0 0 2px" }}>Automation Readiness</p>
               <p style={{ fontFamily:FONT, fontSize:"18px", fontWeight:800, color:readinessColor, margin:0 }}>{sc.emoji} {sc.label}</p>
