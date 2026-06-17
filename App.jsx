@@ -641,7 +641,7 @@ function Results({ contact, answers, aiRecs, loading, onRestart }) {
 
   return (
     <Shell tag="Your Results">
-      <style>{`@media (max-width:560px){.boko-hero{flex-direction:column;}.boko-hero-text{text-align:center;width:100%;}}`}</style>
+      <style>{`@media (max-width:560px){.boko-hero{flex-direction:column;}.boko-hero-text{text-align:center;width:100%;}.boko-cta{flex-direction:column;}.boko-cta-btn{width:100%;justify-content:center;}}`}</style>
       {/* Score hero */}
       <Card style={{ marginBottom:16 }}>
         <div className="boko-hero" style={{ display:"flex", alignItems:"center", gap:24, flexWrap:"wrap", marginBottom:20 }}>
@@ -755,13 +755,13 @@ function Results({ contact, answers, aiRecs, loading, onRestart }) {
           {sc.label === "Developing"  && "Target your weakest area first for the fastest ROI. Book a 30-min strategy call."}
           {sc.label === "Early Stage" && "Start with 1–2 quick wins, then build a phased automation roadmap with our team."}
         </p>
-        <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
-          <a href="mailto:mariam@boko.com.au?subject=Audit Results — Strategy Call"
+        <div className="boko-cta" style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
+          <a className="boko-cta-btn" href="mailto:mariam@boko.com.au?subject=Audit Results — Strategy Call"
             style={{ display:"inline-flex", alignItems:"center", gap:6, background:LIME, color:BLACK,
               padding:"11px 20px", borderRadius:9, textDecoration:"none", fontFamily:FONT, fontSize:"14px", fontWeight:700 }}>
             Book a strategy call
           </a>
-          <a href="https://boko.com.au" target="_blank" rel="noopener noreferrer"
+          <a className="boko-cta-btn" href="https://boko.com.au" target="_blank" rel="noopener noreferrer"
             style={{ display:"inline-flex", alignItems:"center", gap:6, background:"rgba(255,255,255,0.08)",
               border:"1px solid rgba(255,255,255,0.30)", color:"#F8F9FC",
               padding:"11px 20px", borderRadius:9, textDecoration:"none", fontFamily:FONT, fontSize:"14px", fontWeight:600 }}>
