@@ -1,33 +1,46 @@
 # Boko — AI Automation Audit
 
 A self-contained React single-page app: a 3-minute AI-automation readiness quiz for
-Australian fashion retailers, with optional HubSpot lead capture. Built with Vite,
+Australian fashion retailers, with GoHighLevel lead capture. Built with Vite,
 served as a static site from an nginx container.
 
 There is **no backend** — scoring and recommendations run entirely in the browser.
 
 ---
 
-## 1. HubSpot (already configured)
+## 1. Lead capture (GoHighLevel)
 
-Lead capture is wired up to the Boko portal in `src/App.jsx`:
+On submit, the browser posts the contact and the full results (every answer,
+each area score, total, readiness level, weakest area) to `/api/lead`.
+`api/lead.js` is a Vercel function that forwards that JSON to GoHighLevel.
 
-```js
-const HS_PORTAL_ID = "8173960";
-const HS_FORM_GUID = "31a9c609-ab93-4d80-8231-8aa50a945416";
-```
+Setup, once:
+1. In GHL, create a workflow with the **Inbound Webhook** trigger and copy its URL.
+2. In Vercel: Project > Settings > Environment Variables, add `GHL_WEBHOOK_URL`
+   with that URL, then redeploy.
+3. In the GHL workflow, map the fields (`first_name`, `last_name`, `email`,
+   `phone`, `company_name`, `audit_total_score`, `audit_readiness`,
+   `audit_weakest_area`, `audit_content`, `audit_creative`, `audit_email`,
+   `audit_ads`, `audit_reporting`, `audit_answers_text`), add the tags and
+   send the results email.
 
-To repoint it at a different form later, edit those two constants.
+Without `GHL_WEBHOOK_URL` the quiz still works; leads are just not sent.
+The container (nginx) deploy has no `/api`, so lead capture only works on Vercel.
 
-If you also want the per-area scores stored, create these custom contact
-properties in HubSpot first (Settings → Properties → Create property):
-`ai_audit_total_score`, `ai_audit_readiness`, `ai_audit_inventory`,
-`ai_audit_customer`, `ai_audit_pricing`, `ai_audit_workforce`, `ai_audit_data`.
+The "Book a strategy call" button mails `mariam@boko.com.au`; change that in
+`App.jsx` if needed.
 
-Leave the placeholders as-is and the quiz still works fully — it just won't push leads.
+## Quiz structure
 
-The "Book a strategy call" button mails `mariam@boko.com.au` — change that in
-`src/App.jsx` if needed.
+10 questions, 2 per area, each answer scored 0 to 3, so each area is out of 6
+and the total is out of 30. Early Stage under 10, Developing 10 to 19,
+Advanced 20 to 30. Areas: Product content, Social & ad creative,
+Email & retention, Paid ads, Reporting & connected tools. Each maps to a
+module of the AI-Powered Fashion Accelerator course.
+
+Course demo answer set (used in the R1.1 and R1.2 scripts): answers scoring
+1,1,1,1,2,2,1,1,0,1 give 11 out of 30, Developing, weakest area
+Reporting & connected tools (1/6).
 
 ---
 

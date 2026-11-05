@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 
 // ═══════════════════════════════════════════════════════════════════
-// HUBSPOT CONFIG
-// Replace these two values with your own from HubSpot
-// Dashboard → Marketing → Forms → [your form] → Embed → iframe src
+// LEAD CAPTURE
+// Leads are posted to /api/lead (api/lead.js), a Vercel function that
+// forwards them to the GoHighLevel inbound webhook set in the
+// GHL_WEBHOOK_URL environment variable. Nothing secret lives in the browser.
 // ═══════════════════════════════════════════════════════════════════
-const HS_PORTAL_ID = "8173960";   // Boko HubSpot portal
-const HS_FORM_GUID = "31a9c609-ab93-4d80-8231-8aa50a945416";   // AI Automation Audit form
+const LEAD_ENDPOINT = "/api/lead";
 
 // ═══════════════════════════════════════════════════════════════════
 // DESIGN TOKENS  (Boko brand)
@@ -19,108 +19,111 @@ const WHITE  = "#FFFFFF";
 const FONT   = "'Poppins', system-ui, sans-serif";
 
 // ═══════════════════════════════════════════════════════════════════
-// QUIZ DATA  — 10 questions across 5 AU fashion retail areas
+// QUIZ DATA  — 10 questions across 5 digital marketing areas for AU
+// fashion brands. Each area maps to a module of the AI-Powered Fashion
+// Accelerator course, so the results point students to the right lessons.
 // ═══════════════════════════════════════════════════════════════════
 export const AREAS = [
-  { id: "inventory", label: "Inventory & demand" },
-  { id: "customer",  label: "Customer experience" },
-  { id: "pricing",   label: "Pricing & margin" },
-  { id: "workforce", label: "Workforce & scheduling" },
-  { id: "data",      label: "Data & tech readiness" },
+  { id: "content",   label: "Product content",            module: "Module 2" },
+  { id: "creative",  label: "Social & ad creative",       module: "Module 2" },
+  { id: "email",     label: "Email & retention",          module: "Module 3" },
+  { id: "ads",       label: "Paid ads",                   module: "Module 4" },
+  { id: "reporting", label: "Reporting & connected tools", module: "Modules 1 and 4" },
 ];
 
-const QUESTIONS = [
-  // ── Inventory & demand ────────────────────────────────────────
-  { id: 1, area: "inventory",
-    text: "How do you currently forecast demand and plan stock levels?",
+export const QUESTIONS = [
+  // ── Product content ───────────────────────────────────────────
+  { id: 1, area: "content",
+    text: "How do you write titles and descriptions for new stock?",
     opts: [
-      { text: "Gut feel or past experience",              score: 0 },
-      { text: "Manual review of sales reports",           score: 1 },
-      { text: "Spreadsheet models with historical data",  score: 2 },
-      { text: "Automated forecasting software",           score: 3 },
+      { text: "We copy the supplier's text",                                  score: 0 },
+      { text: "We write each one by hand",                                    score: 1 },
+      { text: "We use AI, one product at a time",                             score: 2 },
+      { text: "AI writes the whole drop from the supplier sheet, we review",  score: 3 },
     ]},
-  { id: 2, area: "inventory",
-    text: "How quickly can you identify a stockout or overstock problem?",
+  { id: 2, area: "content",
+    text: "How do new products get into your online store?",
     opts: [
-      { text: "Only when customers or staff flag it",     score: 0 },
-      { text: "Through weekly stock counts",              score: 1 },
-      { text: "Daily reports from our POS / system",      score: 2 },
-      { text: "Real-time alerts and dashboards",          score: 3 },
+      { text: "One by one in Shopify",                                 score: 0 },
+      { text: "A CSV we build by hand",                                score: 1 },
+      { text: "Bulk import, then manual clean-up",                     score: 2 },
+      { text: "Supplier sheet to draft products automatically",        score: 3 },
     ]},
-  // ── Customer experience ───────────────────────────────────────
-  { id: 3, area: "customer",
-    text: "How do you personalise the experience for repeat customers?",
+  // ── Social & ad creative ──────────────────────────────────────
+  { id: 3, area: "creative",
+    text: "How do you plan and create social posts?",
     opts: [
-      { text: "We treat all customers the same",                   score: 0 },
-      { text: "Staff remember regulars informally",                score: 1 },
-      { text: "Segment by purchase history in our CRM",           score: 2 },
-      { text: "Automated personalisation across all channels",     score: 3 },
+      { text: "When we find time",                                      score: 0 },
+      { text: "Made one at a time in Canva",                            score: 1 },
+      { text: "A monthly calendar with templates",                      score: 2 },
+      { text: "AI drafts the month's posts and captions, scheduled ahead", score: 3 },
     ]},
-  { id: 4, area: "customer",
-    text: "How are post-purchase follow-ups and loyalty managed?",
+  { id: 4, area: "creative",
+    text: "How do you produce new ad creatives?",
     opts: [
-      { text: "No formal follow-up process",                          score: 0 },
-      { text: "Manual email or SMS to customers",                     score: 1 },
-      { text: "Basic loyalty program (stamps / points)",             score: 2 },
-      { text: "Automated flows with personalised messaging",          score: 3 },
+      { text: "We run the same few for months",                         score: 0 },
+      { text: "A designer makes a few each month",                      score: 1 },
+      { text: "Templates with new copy",                                score: 2 },
+      { text: "A system producing fresh concepts every week",           score: 3 },
     ]},
-  // ── Pricing & margin ──────────────────────────────────────────
-  { id: 5, area: "pricing",
-    text: "How do you set and adjust prices across your range?",
+  // ── Email & retention ─────────────────────────────────────────
+  { id: 5, area: "email",
+    text: "How do you personalise for repeat customers?",
     opts: [
-      { text: "Fixed pricing set once per season",               score: 0 },
-      { text: "Ad-hoc adjustments based on feel",                score: 1 },
-      { text: "Regular reviews using sales data",                score: 2 },
-      { text: "Dynamic pricing with margin-aware rules",         score: 3 },
+      { text: "Everyone gets the same email",                                              score: 0 },
+      { text: "Staff remember regulars, plus some manual lists",                           score: 1 },
+      { text: "Segments by purchase history in our email platform (Klaviyo, Mailchimp)",   score: 2 },
+      { text: "Automated personalisation by behaviour across email and SMS",               score: 3 },
     ]},
-  { id: 6, area: "pricing",
-    text: "How do you handle markdowns and end-of-season clearance?",
+  { id: 6, area: "email",
+    text: "Which automated emails do you have running?",
     opts: [
-      { text: "Decide last minute when stock piles up",             score: 0 },
-      { text: "Fixed markdown schedule, set manually",              score: 1 },
-      { text: "Data-informed decisions each cycle",                 score: 2 },
-      { text: "Automated triggers based on sell-through rate",      score: 3 },
+      { text: "None, newsletters only",                                         score: 0 },
+      { text: "Welcome email only",                                             score: 1 },
+      { text: "Welcome and abandoned cart",                                     score: 2 },
+      { text: "Welcome, abandoned cart, post-purchase, win-back and VIP",       score: 3 },
     ]},
-  // ── Workforce & scheduling ────────────────────────────────────
-  { id: 7, area: "workforce",
-    text: "How do you build your staff roster each week?",
+  // ── Paid ads ──────────────────────────────────────────────────
+  { id: 7, area: "ads",
+    text: "How are your Meta and Google ads run?",
     opts: [
-      { text: "Manually, based on manager judgement",                    score: 0 },
-      { text: "Spreadsheet with fixed patterns",                         score: 1 },
-      { text: "Software that factors in sales forecasts",                score: 2 },
-      { text: "AI-optimised scheduling linked to foot traffic data",     score: 3 },
+      { text: "Boosted posts, or no ads",                              score: 0 },
+      { text: "Only around sales",                                     score: 1 },
+      { text: "Always on, reviewed monthly",                           score: 2 },
+      { text: "Always on, weekly review and creative refresh",         score: 3 },
     ]},
-  { id: 8, area: "workforce",
-    text: "How do you manage last-minute staff changes or no-shows?",
+  { id: 8, area: "ads",
+    text: "How are your products set up for Google Shopping and Meta catalogues?",
     opts: [
-      { text: "Manual phone calls to find cover",                score: 0 },
-      { text: "WhatsApp group to find available staff",          score: 1 },
-      { text: "App with shift-swap features",                    score: 2 },
-      { text: "Automated alerts and self-service swap system",   score: 3 },
+      { text: "Not connected",                                                       score: 0 },
+      { text: "Connected, with supplier titles",                                     score: 1 },
+      { text: "Connected, some titles edited",                                       score: 2 },
+      { text: "Titles optimised for how customers search, and kept updated",         score: 3 },
     ]},
-  // ── Data & tech readiness ─────────────────────────────────────
-  { id: 9, area: "data",
-    text: "How connected are your core systems — POS, e-com, inventory, accounting?",
+  // ── Reporting & connected tools ───────────────────────────────
+  { id: 9, area: "reporting",
+    text: "How do you report on sales and marketing?",
     opts: [
-      { text: "All separate — no integration",                       score: 0 },
-      { text: "Manual data transfer between systems",                score: 1 },
-      { text: "Some integrations in place",                          score: 2 },
-      { text: "Fully integrated with real-time data sync",           score: 3 },
+      { text: "We don't, beyond Shopify's home screen",                         score: 0 },
+      { text: "Numbers pulled into a spreadsheet monthly",                      score: 1 },
+      { text: "Platform dashboards checked regularly",                          score: 2 },
+      { text: "An automated weekly report across Shopify, email and ads",       score: 3 },
     ]},
-  { id: 10, area: "data",
-    text: "How central is data to your day-to-day business decisions?",
+  { id: 10, area: "reporting",
+    text: "How connected are your tools (Shopify, POS, email, ads, accounting or ERP)?",
     opts: [
-      { text: "Mostly intuition — we don't track much",       score: 0 },
-      { text: "Basic reports reviewed occasionally",          score: 1 },
-      { text: "Dashboards guide key decisions",               score: 2 },
-      { text: "Data is central to every strategic call",      score: 3 },
+      { text: "We re-key data between them",                score: 0 },
+      { text: "Some built-in integrations",                 score: 1 },
+      { text: "Mostly connected, a few manual steps",       score: 2 },
+      { text: "Fully connected, data flows automatically",  score: 3 },
     ]},
 ];
 
 // ═══════════════════════════════════════════════════════════════════
-// SCORING
+// SCORING  — each answer 0 to 3, each area out of 6, total out of 30.
+// Early Stage under 10, Developing 10 to 19, Advanced 20 to 30.
 // ═══════════════════════════════════════════════════════════════════
-function calcScores(answers) {
+export function calcScores(answers) {
   const areas = {};
   AREAS.forEach(({ id, label }) => {
     const qs = QUESTIONS.filter(q => q.area === id);
@@ -130,81 +133,133 @@ function calcScores(answers) {
   const total = Object.values(areas).reduce((s, a) => s + a.score, 0);
   const max = 30;
   const pct = Math.round((total / max) * 100);
-  const label = total <= 10 ? "Early Stage" : total <= 20 ? "Developing" : "Advanced";
-  const emoji = total <= 10 ? "🔴" : total <= 20 ? "🟡" : "🟢";
-  const weakest = Object.entries(areas).sort(([,a],[,b]) => (a.score/a.max)-(b.score/b.max))[0][0];
+  const label = total < 10 ? "Early Stage" : total < 20 ? "Developing" : "Advanced";
+  const emoji = total < 10 ? "🔴" : total < 20 ? "🟡" : "🟢";
+  // Lowest share of its area max first; ties keep the AREAS order.
+  const weakest = AREAS
+    .map(a => a.id)
+    .sort((x, y) => (areas[x].score / areas[x].max) - (areas[y].score / areas[y].max))[0];
   return { total, max, pct, areas, label, emoji, weakest };
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// HUBSPOT FORM SUBMISSION
+// LEAD SUBMISSION  (GoHighLevel via /api/lead)
+// Sends the contact plus the full results: every answer, every area
+// score, the total, the readiness level and the weakest area.
 // ═══════════════════════════════════════════════════════════════════
-async function submitToHubSpot(contact, answers) {
-  if (HS_PORTAL_ID === "YOUR_PORTAL_ID") return; // not configured yet
+export function buildLeadPayload(contact, answers) {
   const sc = calcScores(answers);
-  const fields = [
-    { name: "firstname",               value: contact.name.split(" ")[0] || contact.name },
-    { name: "lastname",                value: contact.name.split(" ").slice(1).join(" ") || "" },
-    { name: "email",                   value: contact.email },
-    { name: "phone",                   value: contact.phone || "" },
-    { name: "company",                 value: contact.business || "" },
-    // Custom properties — create these in HubSpot first (see README section below)
-    { name: "ai_audit_total_score",    value: String(sc.total) },
-    { name: "ai_audit_readiness",      value: sc.label },
-    { name: "ai_audit_inventory",      value: String(sc.areas.inventory.score) },
-    { name: "ai_audit_customer",       value: String(sc.areas.customer.score) },
-    { name: "ai_audit_pricing",        value: String(sc.areas.pricing.score) },
-    { name: "ai_audit_workforce",      value: String(sc.areas.workforce.score) },
-    { name: "ai_audit_data",           value: String(sc.areas.data.score) },
-  ];
+  const name = (contact.name || "").trim();
+  const answerRows = QUESTIONS.map(q => {
+    const opt = q.opts.find(o => o.score === answers[q.id]);
+    return { question: q.text, area: q.area, answer: opt ? opt.text : "", score: answers[q.id] ?? null };
+  });
+  return {
+    first_name: name.split(" ")[0] || name,
+    last_name:  name.split(" ").slice(1).join(" "),
+    email:      (contact.email || "").trim(),
+    phone:      (contact.phone || "").trim(),
+    company_name: (contact.business || "").trim(),
+    source:     "AI Automation Audit (audit.boko.com.au)",
+    tags:       ["ai-automation-audit", `audit-${sc.label.toLowerCase().replace(" ", "-")}`],
+    audit_total_score:   sc.total,
+    audit_max_score:     sc.max,
+    audit_readiness:     sc.label,
+    audit_weakest_area:  sc.areas[sc.weakest].label,
+    audit_content:       sc.areas.content.score,
+    audit_creative:      sc.areas.creative.score,
+    audit_email:         sc.areas.email.score,
+    audit_ads:           sc.areas.ads.score,
+    audit_reporting:     sc.areas.reporting.score,
+    audit_answers:       answerRows,
+    audit_answers_text:  answerRows.map((r, i) => `Q${i + 1}. ${r.question} ${r.answer} (${r.score}/3)`).join("\n"),
+    page_url: typeof window !== "undefined" ? window.location.href : "",
+  };
+}
+
+async function submitLead(contact, answers) {
   try {
-    await fetch(
-      `https://api.hsforms.com/submissions/v3/integration/submit/${HS_PORTAL_ID}/${HS_FORM_GUID}`,
-      { method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ fields, context: { pageUri: typeof window !== "undefined" ? window.location.href : "" } }) }
-    );
-  } catch (e) { console.warn("HubSpot submission error:", e); }
+    await fetch(LEAD_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(buildLeadPayload(contact, answers)),
+    });
+  } catch (e) { console.warn("Lead submission error:", e); }
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// SMART RECOMMENDATIONS  (score-based, no API call needed)
+// RECOMMENDATIONS  (score-based, no API call needed)
+// Every recommendation is taught in the AI-Powered Fashion Accelerator.
 // ═══════════════════════════════════════════════════════════════════
-function generateRecs(contact, answers) {
+export const AREA_RECS = {
+  content: {
+    topOpportunity: "Product content is where most fashion brands lose the most hours. Every new drop means titles, descriptions and SEO written by hand, and supplier copy that nobody searches for.",
+    quickWins:  [
+      "Give Claude your next supplier sheet and have it draft the descriptions in your brand voice",
+      "Rewrite the SEO titles and meta descriptions of your 20 best sellers to match how Australians search",
+      "Run a Claude SEO audit on one product page that gets seen in Google but rarely clicked",
+    ],
+    threeMonth: [
+      "Set up a weekly Claude task that turns new supplier sheets into Shopify draft products for you to review",
+      "Add intro and buying guide copy to your top collection pages, like Dresses and Knitwear",
+    ],
+  },
+  creative: {
+    topOpportunity: "Fresh, genuinely different creative is now what drives Meta ad performance. Running the same few ads for months pushes your cost per sale up.",
+    quickWins:  [
+      "Plan six different ad concepts with Claude: a different angle, visual and format each, not just new headlines",
+      "Build a Canva template for each concept and use Bulk Create for its headline variants",
+      "Resize your best product photos to 1:1, 4:5 and 9:16 in one go",
+    ],
+    threeMonth: [
+      "Set up a monthly social calendar where Claude drafts the posts and captions and you approve them",
+      "Add new ad concepts every week, based on what last week's results showed",
+    ],
+  },
+  email: {
+    topOpportunity: "Email is your highest-margin channel. Customers who already bought from you are the easiest to bring back for the next drop, if the right flows are running.",
+    quickWins:  [
+      "Check your abandoned checkout flow is live and stops as soon as someone buys",
+      "Build five segments in your email platform: champions, at-risk VIPs, potential loyalists, one-time buyers and lapsed customers",
+      "Connect Klaviyo to Claude and ask what your high churn risk customers have in common",
+    ],
+    threeMonth: [
+      "Build a three-email win-back flow timed to how often your customers actually buy",
+      "Launch a VIP flow with early access to new collections for your best customers",
+    ],
+  },
+  ads: {
+    topOpportunity: "Ads that only run around sales, or run on supplier product titles, cost more per sale than they should. A clean product feed and a weekly review are the fastest fixes.",
+    quickWins:  [
+      "Set Data sharing to Maximum in Shopify's Facebook & Instagram app so Meta can see your sales",
+      "Rewrite the Google Shopping titles of your top 20 products to match what customers search",
+      "Check free product listings are switched on in Google Merchant Center",
+    ],
+    threeMonth: [
+      "Run an always-on Meta Advantage+ sales campaign with several genuinely different ad concepts",
+      "Build a Performance Max campaign with negative keywords and brand exclusions, launched well before your next sale",
+    ],
+  },
+  reporting: {
+    topOpportunity: "When your numbers live in five different dashboards, decisions wait until someone has time to pull them together. Connecting your tools is what makes every other automation work.",
+    quickWins:  [
+      "List every tool you use and where data gets re-typed between them",
+      "Connect Claude to Shopify, Klaviyo and your ad accounts so it can read your real numbers",
+      "Run a 20-minute Monday review of last week's ads with Claude: what to pause, keep and scale",
+    ],
+    threeMonth: [
+      "Set up an automated weekly report covering Shopify sales, email revenue and ad results",
+      "Connect your POS, Shopify and accounting (or ERP) so sales and stock data flow without manual exports",
+    ],
+  },
+};
+
+export function generateRecs(contact, answers) {
   const sc = calcScores(answers);
-  const areaRecs = {
-    inventory: {
-      topOpportunity: "Your inventory processes have the highest automation ROI — real-time stock visibility and demand forecasting can cut overstock costs by 20–30%.",
-      quickWins:  ["Set up automated low-stock alerts in your POS or inventory system this week","Connect your POS to a free inventory tool (Shopify, DEAR, or Cin7 trial) to centralise data","Build a simple reorder-point spreadsheet for your top 30 SKUs"],
-      threeMonth: ["Integrate supplier portals to automate purchase orders when stock hits reorder points","Implement AI demand forecasting to predict seasonal stock needs 6 weeks ahead"]
-    },
-    customer: {
-      topOpportunity: "Customer retention is your fastest revenue lever — automated loyalty and post-purchase sequences typically deliver 15–25% repeat purchase uplift.",
-      quickWins:  ["Launch a simple points loyalty program via Smile.io or Yotpo (free tier)","Set up a 3-email post-purchase sequence: thank you → review request → product tip","Create 3 customer segments in Klaviyo: new, repeat, and lapsed 90+ days"],
-      threeMonth: ["Build an automated win-back flow for customers inactive for 60+ days","Implement personalised product recommendation emails based on purchase history"]
-    },
-    pricing: {
-      topOpportunity: "Smarter pricing and markdown automation can recover 10–15% margin leakage across your range each season.",
-      quickWins:  ["Build a simple markdown calendar in Google Sheets tied to your sell-through targets","Review and update your top 20 SKU prices against competitor benchmarks this week","Set up weekly automated sell-through reports from your POS or Shopify"],
-      threeMonth: ["Implement automated markdown triggers based on sell-through rate thresholds","Connect your pricing tool to real-time competitor data for dynamic adjustments"]
-    },
-    workforce: {
-      topOpportunity: "Workforce scheduling optimisation is typically worth 6–10 hours of admin saved per week for fashion retail teams.",
-      quickWins:  ["Switch from spreadsheet rostering to Deputy or Humanforce (free trial available)","Create a shared availability calendar so staff can update their own availability","Set up automated shift reminder SMS/emails to reduce no-shows"],
-      threeMonth: ["Implement AI-optimised scheduling that factors in foot traffic and sales forecasts","Build a self-service shift-swap system so staff manage cover without manager involvement"]
-    },
-    data: {
-      topOpportunity: "Connecting your core systems (POS, e-com, accounting) is the single change that unlocks every other automation in your business.",
-      quickWins:  ["Map your current tech stack and identify the top 3 data gaps this week","Connect your POS to Xero or MYOB using a free Zapier integration","Set up a weekly automated sales summary email from your POS or Shopify"],
-      threeMonth: ["Build a core integration layer connecting POS, e-com, and accounting in real-time","Create a single dashboard showing sales, inventory, and margin KPIs in one view"]
-    }
-  };
-
-  const timeSaved   = sc.total <= 10 ? "4–8 hrs/week"  : sc.total <= 20 ? "6–12 hrs/week" : "10–18 hrs/week";
-  const revenueLift = sc.total <= 10 ? "$2,000–$5,000/month" : sc.total <= 20 ? "$4,000–$10,000/month" : "$8,000–$20,000/month";
-  const benchmark   = "Australian fashion retailers investing in AI automation now are seeing 18–28% revenue uplift within 12 months — the window for first-mover advantage is closing fast.";
-
-  const recs = areaRecs[sc.weakest] || areaRecs.data;
-  return { ...recs, timeSaved, revenueLift, benchmark };
+  const area = AREAS.find(a => a.id === sc.weakest);
+  const timeSaved = sc.total < 10 ? "4–8 hrs/week" : sc.total < 20 ? "6–12 hrs/week" : "10–18 hrs/week";
+  const recs = AREA_RECS[sc.weakest] || AREA_RECS.reporting;
+  return { ...recs, timeSaved, courseModule: area ? area.module : null };
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -301,14 +356,14 @@ function Landing({ onStart }) {
         </h1>
 
         <p style={{ fontFamily:FONT, fontSize:"15px", lineHeight:1.65, color:GRAY, margin:"0 0 20px" }}>
-          10 questions that benchmark your operations against where the Australian fashion market is heading — and surface the fastest commercial returns available to your business right now.
+          10 questions on how automated your marketing really is: product content, social and ad creative, email, paid ads and reporting. You get a score out of 30 and the fastest wins for your fashion brand.
         </p>
 
         <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:24 }}>
           {[
             "3 minutes to complete",
             "Instant score and breakdown",
-            "No sign-up required",
+            "Free, with your results emailed to you",
           ].map(txt => (
             <div key={txt} style={{ display:"flex", alignItems:"flex-start", gap:10 }}>
               <LimeDot />
@@ -336,7 +391,7 @@ function Landing({ onStart }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
-// SCREEN 2 — CONTACT CAPTURE  (HubSpot lead data)
+// SCREEN 2 — CONTACT CAPTURE  (GoHighLevel lead data)
 // ═══════════════════════════════════════════════════════════════════
 function ContactForm({ onNext, onBack }) {
   const [form, setForm] = useState({ name: "", business: "", email: "", phone: "" });
@@ -521,7 +576,7 @@ function QuizScreen({ qIndex, answers, onAnswer, onNext, onBack }) {
 // SCREEN 4 — LOADING / AI ANALYSIS
 // ═══════════════════════════════════════════════════════════════════
 function LoadingScreen() {
-  const steps = ["Scoring your responses…", "Benchmarking against AU fashion market…", "Generating your action plan…"];
+  const steps = ["Scoring your responses…", "Comparing your five marketing areas…", "Generating your action plan…"];
   const [step, setStep] = useState(0);
 
   useEffect(() => {
@@ -711,30 +766,20 @@ function Results({ contact, answers, aiRecs, loading, onRestart }) {
                 </p>
               </div>
             )}
-            {aiRecs.benchmark && (
-              <div style={{ background:"#EFF6FF", border:"1px solid #BFDBFE", borderRadius:10, padding:"13px 15px" }}>
-                <p style={{ fontFamily:FONT, fontSize:"12px", color:"#1E40AF", margin:0, lineHeight:1.65 }}>
-                  <strong>📊 Market context:</strong> {aiRecs.benchmark}
-                </p>
-              </div>
-            )}
             {aiRecs.quickWins    && <RecPanel title="Quick wins"           sub="Implement within 30 days"  items={aiRecs.quickWins}  accent="#22C55E" />}
             {aiRecs.threeMonth   && <RecPanel title="3-month automations"  sub="Medium-term plays"         items={aiRecs.threeMonth} accent="#F59E0B" />}
 
-            {(aiRecs.timeSaved || aiRecs.revenueLift) && (
-              <div style={{ display:"flex", flexWrap:"wrap", gap:12 }}>
-                {aiRecs.timeSaved && (
-                  <div style={{ flex:"1 1 200px", background:"#ECFDF5", border:"1px solid #A7F3D0", borderRadius:10, padding:14, textAlign:"center" }}>
-                    <p style={{ fontFamily:FONT, fontWeight:800, fontSize:"20px", color:"#059669", margin:"0 0 2px" }}>{aiRecs.timeSaved}</p>
-                    <p style={{ fontFamily:FONT, fontSize:"10px", color:"#065F46", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.05em", margin:0 }}>Time saved/week</p>
-                  </div>
-                )}
-                {aiRecs.revenueLift && (
-                  <div style={{ flex:"1 1 200px", background:"#EFF6FF", border:"1px solid #BFDBFE", borderRadius:10, padding:14, textAlign:"center" }}>
-                    <p style={{ fontFamily:FONT, fontWeight:800, fontSize:"20px", color:"#1D4ED8", margin:"0 0 2px" }}>{aiRecs.revenueLift}</p>
-                    <p style={{ fontFamily:FONT, fontSize:"10px", color:"#1E3A8A", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.05em", margin:0 }}>Revenue uplift/month</p>
-                  </div>
-                )}
+            {aiRecs.timeSaved && (
+              <div style={{ background:"#ECFDF5", border:"1px solid #A7F3D0", borderRadius:10, padding:14, textAlign:"center" }}>
+                <p style={{ fontFamily:FONT, fontWeight:800, fontSize:"20px", color:"#059669", margin:"0 0 2px" }}>{aiRecs.timeSaved}</p>
+                <p style={{ fontFamily:FONT, fontSize:"10px", color:"#065F46", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.05em", margin:0 }}>Estimated time you could save</p>
+              </div>
+            )}
+            {aiRecs.courseModule && (
+              <div style={{ background:LGRAY, border:"1px solid #E5E7EB", borderRadius:10, padding:"13px 15px" }}>
+                <p style={{ fontFamily:FONT, fontSize:"13px", color:BLACK, margin:0, lineHeight:1.65 }}>
+                  <strong>Where to learn it:</strong> {sc.areas[sc.weakest]?.label} is covered step by step in {aiRecs.courseModule} of the AI-Powered Fashion Accelerator.
+                </p>
               </div>
             )}
           </div>
@@ -820,7 +865,7 @@ export default function App() {
       window.scrollTo(0, 0);
       setAiLoad(true);
       setAiRecs(null);
-      await submitToHubSpot(contact, answers);
+      await submitLead(contact, answers);
       // Small delay so loading animation is visible, then generate instantly
       await new Promise(r => setTimeout(r, 1400));
       try { setAiRecs(generateRecs(contact, answers)); } catch (e) { console.error(e); }
