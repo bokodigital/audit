@@ -176,6 +176,10 @@ export function buildLeadPayload(contact, answers) {
     audit_email:         sc.areas.email.score,
     audit_meta:          sc.areas.meta.score,
     audit_google:        sc.areas.google.score,
+    // Old field names, kept so the existing GHL mapping keeps working until
+    // it is updated: creative = social content, ads = Meta + Google.
+    audit_creative:      sc.areas.social.score,
+    audit_ads:           sc.areas.meta.score + sc.areas.google.score,
     audit_reporting:     sc.areas.reporting.score,
     audit_answers:       answerRows,
     audit_answers_text:  answerRows.map((r, i) => `Q${i + 1}. ${r.question} ${r.answer} (${r.score}/3)`).join("\n"),
