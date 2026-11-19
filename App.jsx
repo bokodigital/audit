@@ -19,20 +19,23 @@ const WHITE  = "#FFFFFF";
 const FONT   = "'Poppins', system-ui, sans-serif";
 
 // ═══════════════════════════════════════════════════════════════════
-// QUIZ DATA  — 10 questions across 5 digital marketing areas for AU
-// fashion brands. Each area maps to a module of the AI-Powered Fashion
-// Accelerator course, so the results point students to the right lessons.
+// QUIZ DATA  — 10 questions across 6 digital marketing areas for AU
+// fashion brands. Each area maps to one module of the 8-module
+// AI-Powered Fashion Accelerator (Modules 3 to 8). Modules 1 and 2
+// (Find Your Hours, Set Up Claude) are the starting point for everyone.
+// The same 6 areas are used by the hours calculator.
 // ═══════════════════════════════════════════════════════════════════
 export const AREAS = [
-  { id: "content",   label: "Product content",            module: "Module 2" },
-  { id: "creative",  label: "Social & ad creative",       module: "Module 2" },
-  { id: "email",     label: "Email & retention",          module: "Module 3" },
-  { id: "ads",       label: "Paid ads",                   module: "Module 4" },
-  { id: "reporting", label: "Reporting & connected tools", module: "Modules 1 and 4" },
+  { id: "content",   label: "Product content",             module: "Module 3: Product Content and SEO" },
+  { id: "social",    label: "Social content",              module: "Module 4: Social Content" },
+  { id: "email",     label: "Email & retention",           module: "Module 5: Email That Sells" },
+  { id: "meta",      label: "Meta ads",                    module: "Module 6: Meta Ads" },
+  { id: "google",    label: "Google ads",                  module: "Module 7: Google Ads and Shopping" },
+  { id: "reporting", label: "Reporting & connected tools", module: "Module 8: Reporting and Connected Tools" },
 ];
 
 export const QUESTIONS = [
-  // ── Product content ───────────────────────────────────────────
+  // ── Product content ─────────────────────────────────────────────
   { id: 1, area: "content",
     text: "How do you write titles and descriptions for new stock?",
     opts: [
@@ -49,8 +52,8 @@ export const QUESTIONS = [
       { text: "Bulk import, then manual clean-up",                     score: 2 },
       { text: "Supplier sheet to draft products automatically",        score: 3 },
     ]},
-  // ── Social & ad creative ──────────────────────────────────────
-  { id: 3, area: "creative",
+  // ── Social content ──────────────────────────────────────────────
+  { id: 3, area: "social",
     text: "How do you plan and create social posts?",
     opts: [
       { text: "When we find time",                                      score: 0 },
@@ -58,15 +61,7 @@ export const QUESTIONS = [
       { text: "A monthly calendar with templates",                      score: 2 },
       { text: "AI drafts the month's posts and captions, scheduled ahead", score: 3 },
     ]},
-  { id: 4, area: "creative",
-    text: "How do you produce new ad creatives?",
-    opts: [
-      { text: "We run the same few for months",                         score: 0 },
-      { text: "A designer makes a few each month",                      score: 1 },
-      { text: "Templates with new copy",                                score: 2 },
-      { text: "A system producing fresh concepts every week",           score: 3 },
-    ]},
-  // ── Email & retention ─────────────────────────────────────────
+  // ── Email & retention ───────────────────────────────────────────
   { id: 5, area: "email",
     text: "How do you personalise for repeat customers?",
     opts: [
@@ -83,24 +78,33 @@ export const QUESTIONS = [
       { text: "Welcome and abandoned cart",                                     score: 2 },
       { text: "Welcome, abandoned cart, post-purchase, win-back and VIP",       score: 3 },
     ]},
-  // ── Paid ads ──────────────────────────────────────────────────
-  { id: 7, area: "ads",
-    text: "How are your Meta and Google ads run?",
+  // ── Meta ads ────────────────────────────────────────────────────
+  { id: 4, area: "meta",
+    text: "How do you produce new Meta ad creatives?",
+    opts: [
+      { text: "We run the same few for months",                         score: 0 },
+      { text: "A designer makes a few each month",                      score: 1 },
+      { text: "Templates with new copy",                                score: 2 },
+      { text: "A system producing fresh concepts every week",           score: 3 },
+    ]},
+  { id: 7, area: "meta",
+    text: "How are your Meta ads run?",
     opts: [
       { text: "Boosted posts, or no ads",                              score: 0 },
       { text: "Only around sales",                                     score: 1 },
       { text: "Always on, reviewed monthly",                           score: 2 },
       { text: "Always on, weekly review and creative refresh",         score: 3 },
     ]},
-  { id: 8, area: "ads",
-    text: "How are your products set up for Google Shopping and Meta catalogues?",
+  // ── Google ads ──────────────────────────────────────────────────
+  { id: 8, area: "google",
+    text: "How are your products set up for Google Shopping?",
     opts: [
       { text: "Not connected",                                                       score: 0 },
       { text: "Connected, with supplier titles",                                     score: 1 },
       { text: "Connected, some titles edited",                                       score: 2 },
       { text: "Titles optimised for how customers search, and kept updated",         score: 3 },
     ]},
-  // ── Reporting & connected tools ───────────────────────────────
+  // ── Reporting & connected tools ─────────────────────────────────
   { id: 9, area: "reporting",
     text: "How do you report on sales and marketing?",
     opts: [
@@ -120,7 +124,8 @@ export const QUESTIONS = [
 ];
 
 // ═══════════════════════════════════════════════════════════════════
-// SCORING  — each answer 0 to 3, each area out of 6, total out of 30.
+// SCORING  — each answer 0 to 3, total out of 30. Areas have 1 or 2
+// questions (out of 3 or 6), so the weakest area is picked by share of max.
 // Early Stage under 10, Developing 10 to 19, Advanced 20 to 30.
 // ═══════════════════════════════════════════════════════════════════
 export function calcScores(answers) {
@@ -167,9 +172,10 @@ export function buildLeadPayload(contact, answers) {
     audit_readiness:     sc.label,
     audit_weakest_area:  sc.areas[sc.weakest].label,
     audit_content:       sc.areas.content.score,
-    audit_creative:      sc.areas.creative.score,
+    audit_social:        sc.areas.social.score,
     audit_email:         sc.areas.email.score,
-    audit_ads:           sc.areas.ads.score,
+    audit_meta:          sc.areas.meta.score,
+    audit_google:        sc.areas.google.score,
     audit_reporting:     sc.areas.reporting.score,
     audit_answers:       answerRows,
     audit_answers_text:  answerRows.map((r, i) => `Q${i + 1}. ${r.question} ${r.answer} (${r.score}/3)`).join("\n"),
@@ -204,16 +210,16 @@ export const AREA_RECS = {
       "Add intro and buying guide copy to your top collection pages, like Dresses and Knitwear",
     ],
   },
-  creative: {
-    topOpportunity: "Fresh, genuinely different creative is now what drives Meta ad performance. Running the same few ads for months pushes your cost per sale up.",
+  social: {
+    topOpportunity: "Posting when you find time means your feed goes quiet exactly when you're busiest: drops, restocks and sales. A planned month of posts in your own voice keeps you visible without the daily scramble.",
     quickWins:  [
-      "Plan six different ad concepts with Claude: a different angle, visual and format each, not just new headlines",
-      "Build a Canva template for each concept and use Bulk Create for its headline variants",
-      "Resize your best product photos to 1:1, 4:5 and 9:16 in one go",
+      "Have Claude plan next month's posts around your drops, restocks and sales",
+      "Write a week of captions in your brand voice with Claude in one sitting",
+      "Turn one product shoot into ten posts and stories with Canva templates",
     ],
     threeMonth: [
-      "Set up a monthly social calendar where Claude drafts the posts and captions and you approve them",
-      "Add new ad concepts every week, based on what last week's results showed",
+      "Set up a monthly routine: Claude drafts the posts, captions and reel ideas, you approve, and posts are scheduled a week ahead",
+      "Post at least one reel a week, planned with a hook and a shot list",
     ],
   },
   email: {
@@ -228,16 +234,28 @@ export const AREA_RECS = {
       "Launch a VIP flow with early access to new collections for your best customers",
     ],
   },
-  ads: {
-    topOpportunity: "Ads that only run around sales, or run on supplier product titles, cost more per sale than they should. A clean product feed and a weekly review are the fastest fixes.",
+  meta: {
+    topOpportunity: "Fresh, genuinely different creative is now what drives Meta ad performance. Running the same few ads for months, or only around sales, pushes your cost per sale up.",
     quickWins:  [
       "Set Data sharing to Maximum in Shopify's Facebook & Instagram app so Meta can see your sales",
-      "Rewrite the Google Shopping titles of your top 20 products to match what customers search",
-      "Check free product listings are switched on in Google Merchant Center",
+      "Plan six different ad concepts with Claude: a different angle, visual and format each, not just new headlines",
+      "Resize your best product photos to 1:1, 4:5 and 9:16 in one go",
     ],
     threeMonth: [
-      "Run an always-on Meta Advantage+ sales campaign with several genuinely different ad concepts",
-      "Build a Performance Max campaign with negative keywords and brand exclusions, launched well before your next sale",
+      "Run an always-on Advantage+ sales campaign with several genuinely different ad concepts",
+      "Do a 20-minute weekly creative review with Claude: what to pause, keep and scale",
+    ],
+  },
+  google: {
+    topOpportunity: "Google Shopping runs on your product feed. Supplier titles and missing details like colour, size and gender mean your products don't show for the searches that buy.",
+    quickWins:  [
+      "Rewrite the Google Shopping titles of your top 20 products to match what customers search",
+      "Check free product listings are switched on in Google Merchant Center",
+      "Fix every product under Needs attention in Merchant Center",
+    ],
+    threeMonth: [
+      "Build a Performance Max campaign with a clean feed, audience signals and negative keywords",
+      "Have your sale assets and budget ready well before Black Friday and your other big sales",
     ],
   },
   reporting: {
@@ -245,11 +263,11 @@ export const AREA_RECS = {
     quickWins:  [
       "List every tool you use and where data gets re-typed between them",
       "Connect Claude to Shopify, Klaviyo and your ad accounts so it can read your real numbers",
-      "Run a 20-minute Monday review of last week's ads with Claude: what to pause, keep and scale",
+      "Get yesterday's sales sent to you each morning with a Claude scheduled task",
     ],
     threeMonth: [
       "Set up an automated weekly report covering Shopify sales, email revenue and ad results",
-      "Connect your POS, Shopify and accounting (or ERP) so sales and stock data flow without manual exports",
+      "Run a monthly review against last month and last year that flags what to reorder, push or mark down",
     ],
   },
 };
@@ -257,7 +275,7 @@ export const AREA_RECS = {
 export function generateRecs(contact, answers) {
   const sc = calcScores(answers);
   const area = AREAS.find(a => a.id === sc.weakest);
-  const timeSaved = sc.total < 10 ? "4–8 hrs/week" : sc.total < 20 ? "6–12 hrs/week" : "10–18 hrs/week";
+  const timeSaved = sc.total < 10 ? "4 to 8 hrs/week" : sc.total < 20 ? "6 to 12 hrs/week" : "10 to 18 hrs/week";
   const recs = AREA_RECS[sc.weakest] || AREA_RECS.reporting;
   return { ...recs, timeSaved, courseModule: area ? area.module : null };
 }
@@ -356,7 +374,7 @@ function Landing({ onStart }) {
         </h1>
 
         <p style={{ fontFamily:FONT, fontSize:"15px", lineHeight:1.65, color:GRAY, margin:"0 0 20px" }}>
-          10 questions on how automated your marketing really is: product content, social and ad creative, email, paid ads and reporting. You get a score out of 30 and the fastest wins for your fashion brand.
+          10 questions on how automated your marketing really is: product content, social content, email, Meta ads, Google ads and reporting. You get a score out of 30 and the fastest wins for your fashion brand.
         </p>
 
         <div style={{ display:"flex", flexDirection:"column", gap:10, marginBottom:24 }}>
@@ -576,7 +594,7 @@ function QuizScreen({ qIndex, answers, onAnswer, onNext, onBack }) {
 // SCREEN 4 — LOADING / AI ANALYSIS
 // ═══════════════════════════════════════════════════════════════════
 function LoadingScreen() {
-  const steps = ["Scoring your responses…", "Comparing your five marketing areas…", "Generating your action plan…"];
+  const steps = ["Scoring your responses…", "Comparing your six marketing areas…", "Generating your action plan…"];
   const [step, setStep] = useState(0);
 
   useEffect(() => {
@@ -778,7 +796,7 @@ function Results({ contact, answers, aiRecs, loading, onRestart }) {
             {aiRecs.courseModule && (
               <div style={{ background:LGRAY, border:"1px solid #E5E7EB", borderRadius:10, padding:"13px 15px" }}>
                 <p style={{ fontFamily:FONT, fontSize:"13px", color:BLACK, margin:0, lineHeight:1.65 }}>
-                  <strong>Where to learn it:</strong> {sc.areas[sc.weakest]?.label} is covered step by step in {aiRecs.courseModule} of the AI-Powered Fashion Accelerator.
+                  <strong>Where to learn it:</strong> {sc.areas[sc.weakest]?.label} is covered step by step in {aiRecs.courseModule} of the AI-Powered Fashion Accelerator. Start with Modules 1 and 2 (Find Your Hours, Set Up Claude), then go straight there.
                 </p>
               </div>
             )}
@@ -798,10 +816,10 @@ function Results({ contact, answers, aiRecs, loading, onRestart }) {
         <p style={{ fontFamily:FONT, fontSize:"13px", color:"#F8F9FC", margin:"0 0 18px", lineHeight:1.65 }}>
           {sc.label === "Advanced"    && "You're ready for advanced AI integrations. Let's map a full automation strategy."}
           {sc.label === "Developing"  && "Target your weakest area first for the fastest ROI. Book a 30-min strategy call."}
-          {sc.label === "Early Stage" && "Start with 1–2 quick wins, then build a phased automation roadmap with our team."}
+          {sc.label === "Early Stage" && "Start with 1 or 2 quick wins, then build a phased automation roadmap with our team."}
         </p>
         <div className="boko-cta" style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
-          <a className="boko-cta-btn" href="mailto:mariam@boko.com.au?subject=Audit Results — Strategy Call"
+          <a className="boko-cta-btn" href="mailto:mariam@boko.com.au?subject=Audit Results: Strategy Call"
             style={{ display:"inline-flex", alignItems:"center", gap:6, background:LIME, color:BLACK,
               padding:"11px 20px", borderRadius:9, textDecoration:"none", fontFamily:FONT, fontSize:"14px", fontWeight:700 }}>
             Book a strategy call

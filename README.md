@@ -20,8 +20,8 @@ Setup, once:
    with that URL, then redeploy.
 3. In the GHL workflow, map the fields (`first_name`, `last_name`, `email`,
    `phone`, `company_name`, `audit_total_score`, `audit_readiness`,
-   `audit_weakest_area`, `audit_content`, `audit_creative`, `audit_email`,
-   `audit_ads`, `audit_reporting`, `audit_answers_text`), add the tags and
+   `audit_weakest_area`, `audit_content`, `audit_social`, `audit_email`,
+   `audit_meta`, `audit_google`, `audit_reporting`, `audit_answers_text`), add the tags and
    send the results email.
 
 Without `GHL_WEBHOOK_URL` the quiz still works; leads are just not sent.
@@ -32,11 +32,14 @@ The "Book a strategy call" button mails `mariam@boko.com.au`; change that in
 
 ## Quiz structure
 
-10 questions, 2 per area, each answer scored 0 to 3, so each area is out of 6
-and the total is out of 30. Early Stage under 10, Developing 10 to 19,
-Advanced 20 to 30. Areas: Product content, Social & ad creative,
-Email & retention, Paid ads, Reporting & connected tools. Each maps to a
-module of the AI-Powered Fashion Accelerator course.
+10 questions, each answer scored 0 to 3, total out of 30. Early Stage under
+10, Developing 10 to 19, Advanced 20 to 30. Six areas, each mapped to one
+module of the 8-module AI-Powered Fashion Accelerator (same areas as the hours
+calculator): Product content (Q1, Q2, Module 3), Social content (Q3, Module 4),
+Email & retention (Q5, Q6, Module 5), Meta ads (Q4, Q7, Module 6), Google ads
+(Q8, Module 7), Reporting & connected tools (Q9, Q10, Module 8). Areas with one
+question are out of 3, so the weakest area is picked by share of its max.
+Modules 1 and 2 are the starting point for everyone and aren't scored.
 
 Course demo answer set (used in the R1.1 and R1.2 scripts): answers scoring
 1,1,1,1,2,2,1,1,0,1 give 11 out of 30, Developing, weakest area
