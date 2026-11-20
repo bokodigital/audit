@@ -823,7 +823,7 @@ function Results({ contact, answers, aiRecs, loading, onRestart }) {
           {sc.label === "Early Stage" && "Start with 1 or 2 quick wins, then build a phased automation roadmap with our team."}
         </p>
         <div className="boko-cta" style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
-          <a className="boko-cta-btn" href="mailto:mariam@boko.com.au?subject=Audit Results: Strategy Call"
+          <a className="boko-cta-btn" href="https://boko.com.au/discovery-call/" target="_blank" rel="noopener noreferrer"
             style={{ display:"inline-flex", alignItems:"center", gap:6, background:LIME, color:BLACK,
               padding:"11px 20px", borderRadius:9, textDecoration:"none", fontFamily:FONT, fontSize:"14px", fontWeight:700 }}>
             Book a strategy call
