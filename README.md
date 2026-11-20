@@ -27,8 +27,8 @@ Setup, once:
 Without `GHL_WEBHOOK_URL` the quiz still works; leads are just not sent.
 The container (nginx) deploy has no `/api`, so lead capture only works on Vercel.
 
-The "Book a strategy call" button mails `mariam@boko.com.au`; change that in
-`App.jsx` if needed.
+The "Book a strategy call" button opens the booking page
+(https://boko.com.au/discovery-call/); change that in `App.jsx` if needed.
 
 ## Quiz structure
 
